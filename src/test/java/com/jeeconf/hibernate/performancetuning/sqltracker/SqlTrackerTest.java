@@ -9,20 +9,18 @@ import org.junit.Test;
 /**
  * Created by Igor Dmitriev / Mikalai Alimenkou on 5/1/16
  */
-
 @DatabaseSetup("/sqltracker.xml")
 public class SqlTrackerTest extends BaseTest {
-
     @Test
     public void showStatistics() {
-        Client client = getSession().get(Client.class, 1);
+        Client client = session.get(Client.class, 1);
     }
 
     @Test
     public void sqlCountAssertion() {
-        AssertSqlCount.reset();
-        Account account1 = getSession().get(Account.class, 1);
-        Account account2 = getSession().get(Account.class, 2);
-        AssertSqlCount.assertSelectCount(1);
+        Account account1 = session.get(Account.class, 1);
+        Account account2 = session.get(Account.class, 2);
+
+        AssertSqlCount.assertSelectCount(2);
     }
 }

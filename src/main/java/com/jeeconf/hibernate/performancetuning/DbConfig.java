@@ -10,6 +10,5 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @ComponentScan
 @EnableCaching
-public class Application {
-
+public class DbConfig {
 }

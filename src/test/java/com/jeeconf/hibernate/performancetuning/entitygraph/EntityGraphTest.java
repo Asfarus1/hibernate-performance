@@ -3,6 +3,7 @@ package com.jeeconf.hibernate.performancetuning.entitygraph;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.jeeconf.hibernate.performancetuning.BaseTest;
 import com.jeeconf.hibernate.performancetuning.entitygraph.entity.Client;
+import com.jeeconf.hibernate.performancetuning.sqltracker.AssertSqlCount;
 import org.hibernate.annotations.QueryHints;
 import org.junit.Test;
 
@@ -14,11 +15,14 @@ import java.util.List;
  */
 @DatabaseSetup("/nplusone.xml")
 public class EntityGraphTest extends BaseTest {
-
     @Test
     public void clientFetchAccounts() {
-        List<Client> clients = findAdultClientsFetchAccounts();
+        List<Client> clients = findAdultClientsQuery()
+                .setHint(QueryHints.FETCHGRAPH, em.getEntityGraph(Client.ACCOUNTS_GRAPH))
+                .getResultList();
         clients.forEach(c -> c.getAccounts().size());
+
+        AssertSqlCount.assertSelectCount(1);
     }
 
     private TypedQuery<Client> findAdultClientsQuery() {
@@ -26,15 +30,4 @@ public class EntityGraphTest extends BaseTest {
                 "where c.age >= :age", Client.class)
                 .setParameter("age", 18);
     }
-
-    public List<Client> findAdultClients() {
-        return findAdultClientsQuery().getResultList();
-    }
-
-    public List<Client> findAdultClientsFetchAccounts() {
-        return findAdultClientsQuery()
-                .setHint(QueryHints.FETCHGRAPH, em.getEntityGraph(Client.ACCOUNTS_GRAPH))
-                .getResultList();
-    }
-
 }

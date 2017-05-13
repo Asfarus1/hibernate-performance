@@ -3,6 +3,7 @@ package com.jeeconf.hibernate.performancetuning.nplusone;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.jeeconf.hibernate.performancetuning.BaseTest;
 import com.jeeconf.hibernate.performancetuning.nplusone.entity.Client;
+import com.jeeconf.hibernate.performancetuning.sqltracker.AssertSqlCount;
 import org.junit.Test;
 
 import java.util.List;
@@ -12,26 +13,28 @@ import java.util.List;
  */
 @DatabaseSetup("/nplusone.xml")
 public class NplusOneTest extends BaseTest {
+    @SuppressWarnings("unchecked")
     @Test
     public void npo() {
-        //noinspection unchecked
-        List<Client> clients = getSession().createQuery("select c from com.jeeconf.hibernate.performancetuning.nplusone.entity.Client" +
+        List<Client> clients = session.createQuery("select c from com.jeeconf.hibernate.performancetuning.nplusone.entity.Client" +
                 " c where c.age >= :age")
                 .setParameter("age", 18)
                 .list();
         clients.forEach(c -> c.getAccounts().size());
+
+        AssertSqlCount.assertSelectCount(11);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void joinFetch() {
-        //noinspection unchecked
-        List<Client> clients = getSession().createQuery("select c from com.jeeconf.hibernate.performancetuning.nplusone.entity.Client c" +
+        List<Client> clients = session.createQuery("select c from com.jeeconf.hibernate.performancetuning.nplusone.entity.Client c" +
                 " join fetch c.accounts " +
                 " where c.age >= :age")
                 .setParameter("age", 18)
                 .list();
         clients.forEach(c -> c.getAccounts().size());
+
+        AssertSqlCount.assertSelectCount(1);
     }
-
-
 }
